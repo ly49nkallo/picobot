@@ -21,7 +21,6 @@ class Board():
             for j in range(self.width):
                 l.append(EMPTY)
             self.board.append(l)
-        print(self.board,'r')
         self.load(filename)
         random.seed()
         i = random.randint(0, self.height - 1)
@@ -88,12 +87,37 @@ class Player():
         self.Board = board
         self.instructionPATH = instructionsSet
         self.instructions = self.loadInstructions(self.instructionPATH)
+    def parse(string):
+        parsed = []
+        tmp = str()
+        for p in range(len(string)):
+            
+            if string[p] not in {' ', '\n'}:
+                tmp += string[p]
+            else:
+                parsed.append(tmp)
+                tmp = str()
+            if p == len(string) - 1:
+                parsed.append(tmp)
+                tmp = str()
+        return parsed
+
 
     def loadInstructions(self, instructionsSet):
-        ...
+
+        with open(instructionsSet, 'r') as f:
+            lines = f.readlines()
+        
+        for line in lines:
+            if line[0] == '#':
+                continue
+            p = line.parse(line)
+            
+        raise NotImplementedError
 
 def main():
     b = Board('layout')
+    p = Player(b, 'instructions')
     print(repr(b))
 
 main()
