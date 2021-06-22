@@ -6,6 +6,11 @@ CLEAR = 1
 WALL = 2
 BOT = 3
 
+NORTH = 'N'
+EAST = 'E'
+WEST = 'W'
+SOUTH = 'S'
+
 class Board():
     def __init__(self, filename):
         self.height = 50
@@ -59,11 +64,34 @@ class Board():
                 self.board[i] = l
                 i += 1
         f.close()
+    def neighboringCells(self, center):
+        """
+        Return dict with cardinal keys determining if wall
+        """
+        raise NotImplementedError
+    
+    def locateBot(self):
+        """
+        Return tuple (i. j) of the location of the BOT
+        """
+        raise NotImplementedError
+    
+    def returnWalls(self):
+        """
+        Return set of tuples (i, j) of all walls
+        """
+        raise NotImplementedError
+
 
 class Player():
     def __init__(self, board, instructionsSet):
         self.Board = board
-    
+        self.instructionPATH = instructionsSet
+        self.instructions = self.loadInstructions(self.instructionPATH)
+
+    def loadInstructions(self, instructionsSet):
+        ...
+
 def main():
     b = Board('layout')
     print(repr(b))
