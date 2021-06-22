@@ -1,2 +1,4 @@
 # <state> <surroundings> -> <mov> <newState>
 # this is a comment
+# blank lines are also ignored
+

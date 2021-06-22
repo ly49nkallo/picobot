@@ -10,6 +10,8 @@ NORTH = 'N'
 EAST = 'E'
 WEST = 'W'
 SOUTH = 'S'
+FREE = 'x'
+ANY = '*'
 
 class Board():
     def __init__(self, filename):
@@ -81,18 +83,26 @@ class Board():
         """
         raise NotImplementedError
 
+class Rule():
+    def __init__(self, state, surroundings, move, newState):
+        self.state = state
+        self.surroundings = surroundings
+        self.move = move
+        self.newState = newState
+    def __repr__(self):
+        return str(self.state) + ' ' + str(self.surroundings) + ' -> ' + str(self.move) + ' ' + str(self.newState)
 
 class Player():
     def __init__(self, board, instructionsSet):
         self.Board = board
         self.instructionPATH = instructionsSet
         self.instructions = self.loadInstructions(self.instructionPATH)
-    def parse(string):
+
+    def parse(self, string):
         parsed = []
         tmp = str()
         for p in range(len(string)):
-            
-            if string[p] not in {' ', '\n'}:
+            if string[p] not in {' '}:
                 tmp += string[p]
             else:
                 parsed.append(tmp)
@@ -104,16 +114,71 @@ class Player():
 
 
     def loadInstructions(self, instructionsSet):
-
+        states = set()
+        instructions = set()
         with open(instructionsSet, 'r') as f:
             lines = f.readlines()
-        
         for line in lines:
-            if line[0] == '#':
+            if line[0] == '#' or line == '\n':
                 continue
-            p = line.parse(line)
-            
-        raise NotImplementedError
+            print(line)
+            p = self.parse(line)
+            # syntax checking
+            try: 
+                p[0] = int(p[0])
+                p[4] = int(p[4])
+            except ValueError or TypeError:
+                raise Exception
+            if len(p) != 5:
+                print(p, len(p))
+                raise Exception
+            if not isinstance(p[0], int):
+                raise Exception
+            if not isinstance(p[1], str):
+                raise Exception
+            if len(p[1]) != 4:
+                raise Exception
+            for dir in p[1]:
+                if dir not in {NORTH, SOUTH, EAST, WEST, ANY, FREE}:
+                    raise Exception
+            if not p[2] == '->':
+                raise Exception
+            if p[3] not in {NORTH, SOUTH, EAST, WEST}:
+                raise Exception
+            if not isinstance(p[4], int):
+                raise Exception
+            instructions.add(Rule(p[0], p[1], p[3], p[4]))
+            states.add(p[0])
+
+        if 0 not in states:
+            raise Exception
+        for rule1 in instructions:
+            for rule2 in instructions:
+                if rule1 == rule2:
+                    continue
+                if rule1.state == rule2.state:
+                    print (rule1, rule2, end='')
+                    if rule1.surroundings == rule2.surroundings:
+                        raise Exception
+                    different = False
+                    for i in range(4):
+                        r1 = rule1.surroundings[i]
+                        r2 = rule2.surroundings[i]
+                        print(r1, r2)
+                        if r1 in {NORTH, SOUTH, EAST, WEST} and r2 in {NORTH, SOUTH, EAST, WEST} and r1 != r2:
+                            raise Exception
+                        if r1 in {NORTH, SOUTH, EAST, WEST} and r2 == FREE:
+                            different = True 
+                            break
+                        if r1 == FREE and r2 in {NORTH, SOUTH, EAST, WEST}:
+                            different = True
+                            break
+                        print(' ' + str(different))
+                    if not different:
+                        raise Exception
+        print('Finished loading from file')
+        return instructions
+    
 
 def main():
     b = Board('layout')
