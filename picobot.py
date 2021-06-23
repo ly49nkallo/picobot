@@ -68,9 +68,9 @@ class Board():
             self.board[i] = l
             i += 1
         f.close()
-    def neighboringCells(self, center):
+    def surroundings(self, center):
         """
-        Return dict with cardinal keys determining if wall
+        Return string representation of the surroungs in 'NEWS' format
         """
         i = center[0]
         j = center[1]
@@ -82,15 +82,45 @@ class Board():
     
     def locateBot(self):
         """
-        Return tuple (i. j) of the location of the BOT
+        Return tuple (i, j) of the location of the BOT
         """
-        raise NotImplementedError
+        for i in range(self.height):
+            for j in range(self.width):
+                if self.board[i][j] == BOT:
+                    return (i,j)
+        return Exception
     
     def returnWalls(self):
         """
         Return set of tuples (i, j) of all walls
         """
+        walls = set()
+        for i in range(self.height):
+            for j in range(self.width):
+                if self.board[i][j] == WALL:
+                    walls.add((i,j))
+        return walls
+
+    def moveBot(self, direction):
+        """
+        Change bot's location and check for wall. Return if successful
+        """
+        bot = self.locateBot()
+        if direction == NORTH:
+            newLocation = (bot[0] + 1, bot[1])
+        if direction == SOUTH:
+            newLocation = (bot[0] - 1, bot[1])
+        if direction == EAST:
+            newLocation = (bot[0], bot[1] + 1)
+        if direction == SOUTH:
+            newLocation = (bot[0], bot[1] - 1)
+        if newLocation[0] not in range(self.height) or newLocation[1] not in range(self.width):
+            return False 
+        if newLocation in self.returnWalls():
+            return False
+        
         raise NotImplementedError
+
 
 class Rule():
     def __init__(self, state, surroundings, move, newState):
@@ -106,7 +136,7 @@ class Player():
         self.Board = board
         self.instructionPATH = instructionsSet
         self.instructions = self.loadInstructions(self.instructionPATH)
-        self.step()
+        self.state = 0
     @staticmethod
     def parse(string):
         parsed = []
@@ -188,9 +218,39 @@ class Player():
                         raise Exception
         print('Finished loading from file')
         return instructions
+
     def step(self):
         print(self.instructions)
-        raise NotImplementedError
+        surroundings = self.Board.surroundings(self.Board.locateBot())
+        c = 0
+        for instruction in self.instructions:
+            different = False
+            if self.state != instruction.state:
+                continue
+            for i in range (4):
+                r = instruction.surroundings[i] 
+                if r == ANY:
+                    continue
+                if r not in {NORTH, SOUTH, EAST, WEST, FREE}:
+                    raise Exception
+                if r == surroundings[i]:
+                    continue
+                different = True
+                break
+            if different:
+                continue
+            c += 1
+            ins = instruction
+        if c != 1:
+            raise NameError("no instruction avaliabe or duplicate instruction")
+        if not isinstance(ins, Rule):
+            raise Exception
+        print(ins)
+        if not self.Board.moveBot(i.move):
+            return False
+        self.state = i.newState
+        return True
+
 def main():
     b = Board('layout')
     p = Player(b, 'instructions')
