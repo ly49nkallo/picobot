@@ -2,3 +2,6 @@
 # this is a comment
 # blank lines are also ignored
 
+# go to bottom right
+0 ***x -> S 0
+0 *x*S -> E 0

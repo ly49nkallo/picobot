@@ -13,10 +13,13 @@ SOUTH = 'S'
 FREE = 'x'
 ANY = '*'
 
+HEIGHT = 35
+WIDTH = 50
+
 class Board():
     def __init__(self, filename):
-        self.height = 50
-        self.width = 50
+        self.height = HEIGHT
+        self.width = WIDTH
         self.board = []
         for i in range(self.height):
             l = []
@@ -32,7 +35,6 @@ class Board():
             j = random.randint(0, self.width - 1)
         self.board[i][j] = BOT
     def __repr__(self):
-        print('Height, Width', self.height, self.width)
         msg = str()
         for row in self.board:
             for item in row:
@@ -47,28 +49,35 @@ class Board():
             msg += '\n'
         return msg
     def load(self, filename):
+        i = 0
         with open(filename, 'r') as f:
-            i = 0
-            if len(f.readlines()) > self.height:
-                raise Exception
-            for line in f.readlines():
-                l = []
-                for item in line:
-                    if item == '.':
-                        l.append(EMPTY)
-                    if item == '#':
-                        l.append(WALL)
-                    if item == '_':
-                        l.append(CLEAR)
-                    if item == 'O':
-                        l.append(BOT)
-                self.board[i] = l
-                i += 1
+            r = f.readlines()
+        if len(r) > self.height:
+            raise Exception
+        for line in r:
+            l = []
+            for item in line:
+                if item == '.':
+                    l.append(EMPTY)
+                if item == '#':
+                    l.append(WALL)
+                if item == '_':
+                    l.append(CLEAR)
+                if item == 'O':
+                    l.append(BOT)
+            self.board[i] = l
+            i += 1
         f.close()
     def neighboringCells(self, center):
         """
         Return dict with cardinal keys determining if wall
         """
+        i = center[0]
+        j = center[1]
+        if i == 0 or i == self.height - 1:
+            raise Exception
+        if j == 0 or j == self.width - 1:
+            raise Exception
         raise NotImplementedError
     
     def locateBot(self):
@@ -97,8 +106,9 @@ class Player():
         self.Board = board
         self.instructionPATH = instructionsSet
         self.instructions = self.loadInstructions(self.instructionPATH)
-
-    def parse(self, string):
+        self.step()
+    @staticmethod
+    def parse(string):
         parsed = []
         tmp = str()
         for p in range(len(string)):
@@ -178,13 +188,15 @@ class Player():
                         raise Exception
         print('Finished loading from file')
         return instructions
-    
-
+    def step(self):
+        print(self.instructions)
+        raise NotImplementedError
 def main():
     b = Board('layout')
     p = Player(b, 'instructions')
-    print(repr(b))
+    print(b)
 
-main()
+if __name__ == '__main__':
+    main()
 
         

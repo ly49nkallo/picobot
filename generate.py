@@ -1,9 +1,10 @@
 import sys
+import picobot
 
-if len(sys.argv) != 4:
+if len(sys.argv) != 2:
     print("usage")
-width = int(sys.argv[2])
-height = int(sys.argv[1])
+width = picobot.HEIGHT
+height = picobot.WIDTH
 
 blank = []
 for i in range(width):
@@ -28,6 +29,6 @@ blank[width - 1] = l
 
 
 
-with open(sys.argv[3], 'w') as f:
+with open(sys.argv[1], 'w') as f:
     f.writelines(blank)
     f.close()
