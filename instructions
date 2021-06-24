@@ -1,7 +1,14 @@
-# <state> <surroundings> -> <mov> <newState>
-# this is a comment
-# blank lines are also ignored
-
-# go to bottom right
+# Go to south east corner
 0 ***x -> S 0
 0 *x*S -> E 0
+
+# if in bottom right corner change state
+0 *E*S -> x 1
+
+# go west until wall then go up
+1 **x* -> W 1
+1 x*W* -> N 2
+
+# go east until wall then go up
+2 *x** -> E 2
+2 xE** -> N 1

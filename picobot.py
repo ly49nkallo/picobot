@@ -1,5 +1,6 @@
 import sys
 import random
+import time
 
 EMPTY = 0
 CLEAR = 1
@@ -78,8 +79,39 @@ class Board():
             raise Exception
         if j == 0 or j == self.width - 1:
             raise Exception
-        raise NotImplementedError
-    
+        n = (i - 1, j)
+        e = (i, j + 1)
+        w = (i, j - 1)
+        s = (i + 1, j)
+        N, E, W, S = False, False, False, False
+        walls = self.returnWalls()
+        str = ''
+        for i in range(4):
+            if i == 0:
+                if n in walls:
+                    str += NORTH
+                else:
+                    str += FREE
+            if i == 1:
+                if e in walls:
+                    str += EAST
+                else:
+                    str += FREE
+            if i == 2:
+                if w in walls:
+                    str += WEST
+                else:
+                    str += FREE
+            if i == 3:
+                if s in walls:
+                    str += SOUTH
+                else:
+                    str += FREE
+        if len(str) != 4:
+            raise Exception
+        return str
+
+            
     def locateBot(self):
         """
         Return tuple (i, j) of the location of the BOT
@@ -105,21 +137,28 @@ class Board():
         """
         Change bot's location and check for wall. Return if successful
         """
+        if direction == FREE:
+            return True
         bot = self.locateBot()
         if direction == NORTH:
-            newLocation = (bot[0] + 1, bot[1])
-        if direction == SOUTH:
             newLocation = (bot[0] - 1, bot[1])
+        if direction == SOUTH:
+            newLocation = (bot[0] + 1, bot[1])
         if direction == EAST:
             newLocation = (bot[0], bot[1] + 1)
-        if direction == SOUTH:
+        if direction == WEST:
             newLocation = (bot[0], bot[1] - 1)
         if newLocation[0] not in range(self.height) or newLocation[1] not in range(self.width):
             return False 
         if newLocation in self.returnWalls():
             return False
-        
-        raise NotImplementedError
+        try:
+            self.board[newLocation[0]][newLocation[1]] = BOT
+            self.board[bot[0]][bot[1]] = CLEAR 
+        except:
+            print(newLocation, bot)
+            return False
+        return True
 
 
 class Rule():
@@ -183,7 +222,7 @@ class Player():
                     raise Exception
             if not p[2] == '->':
                 raise Exception
-            if p[3] not in {NORTH, SOUTH, EAST, WEST}:
+            if p[3] not in {NORTH, SOUTH, EAST, WEST, FREE}:
                 raise Exception
             if not isinstance(p[4], int):
                 raise Exception
@@ -220,7 +259,6 @@ class Player():
         return instructions
 
     def step(self):
-        print(self.instructions)
         surroundings = self.Board.surroundings(self.Board.locateBot())
         c = 0
         for instruction in self.instructions:
@@ -245,18 +283,22 @@ class Player():
             raise NameError("no instruction avaliabe or duplicate instruction")
         if not isinstance(ins, Rule):
             raise Exception
-        print(ins)
-        if not self.Board.moveBot(i.move):
+        if not self.Board.moveBot(ins.move):
             return False
-        self.state = i.newState
+        self.state = ins.newState
         return True
 
 def main():
     b = Board('layout')
     p = Player(b, 'instructions')
     print(b)
+    while True:
+        time.sleep(0.05)
+        if p.step():
+            print(b)
+        else:
+            break     
+    return 1
 
 if __name__ == '__main__':
     main()
-
-        
