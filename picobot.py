@@ -14,8 +14,8 @@ SOUTH = 'S'
 FREE = 'x'
 ANY = '*'
 
-HEIGHT = 35
-WIDTH = 50
+HEIGHT = 25
+WIDTH = 35
 
 class Board():
     def __init__(self, filename):
