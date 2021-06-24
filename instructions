@@ -1,14 +1,17 @@
-# Go to south east corner
-0 ***x -> S 0
-0 *x*S -> E 0
+# 
+# Hashtag lines are optional comments
+#
 
-# if in bottom right corner change state
-0 *E*S -> x 1
+# state 0 with nothing N: go one step N
+0 x*** -> N 0
 
-# go west until wall then go up
-1 **x* -> W 1
-1 x*W* -> N 2
+# state 0 with something to the N: go W + into st 1 
+# ** This will crash if picobot has a wall to the W! **
+0 N*** -> W 1
 
-# go east until wall then go up
-2 *x** -> E 2
-2 xE** -> N 1
+
+# state 1 with nothing to the S: go one step S
+1 ***x -> S 1
+
+# state 1 with something to the S: stay put + into state 0
+1 ***S -> x 0
