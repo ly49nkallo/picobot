@@ -177,7 +177,8 @@ class Player():
         self.instructions = self.loadInstructions(self.instructionPATH)
         self.state = 0
     @staticmethod
-    def parse(string):
+    def parse(s):
+        string = s.strip()
         parsed = []
         tmp = str()
         for p in range(len(string)):

@@ -1,7 +1,7 @@
 import sys
 import picobot
 
-if len(sys.argv) != 2:
+if len(sys.argv not in {2,3}):
     print("usage")
     sys.exit()
 width = picobot.WIDTH
